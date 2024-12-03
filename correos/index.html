@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Errores</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Estilo para los botones en la parte superior derecha */
+        .top-buttons {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 100;
+        }
+
+        .top-buttons .btn {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">REGISTRO DE SOLICITUDES Y ERRORES</h1>
+
+        <!-- Contenedor para los botones en la parte superior derecha -->
+        <div class="top-buttons">
+            
+            <a href="resultados.php" class="btn btn-info">Resultados</a>
+        </div>
+
+        <form id="formulario" action="insert.php" method="POST" class="p-4 border rounded shadow">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="fecha_solicitud" class="form-label">Fecha de la Solicitud:</label>
+                    <input type="text" id="fecha_solicitud" name="fecha_solicitud" class="form-control" placeholder="DD-MM-YYYY" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="hora_solicitud" class="form-label">Hora de la Solicitud:</label>
+                    <input type="time" id="hora_solicitud" name="hora_solicitud" class="form-control" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="numero_registro" class="form-label">Número de Registro:</label>
+                    <input type="text" id="numero_registro" name="numero_registro" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="persona_solicitante" class="form-label">Persona que Solicita el Cambio:</label>
+                    <input type="text" id="persona_solicitante" name="persona_solicitante" class="form-control" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="persona_error" class="form-label">Persona que Comete el Error:</label>
+                    <input type="text" id="persona_error" name="persona_error" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="descripcion" class="form-label">Descripción del Error:</label>
+                    <textarea id="descripcion" name="descripcion" class="form-control" rows="2" required></textarea>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="estado_respuesta" class="form-label">Estado de Respuesta:</label>
+                    <select id="estado_correccion" name="estado_correccion" class="form-control" required>
+                        <option value="" disabled selected>Seleccione una opcion</option>
+                        <option value="Realizado">Realizado</option>
+                        <option value="Realizado_sin_respuesta">Realizado sin Respuesta</option>
+                        <option value="Sin_respuesta">Sin Respuesta</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="impacto" class="form-label">Impacto o Consecuencias:</label>
+                    <select id="impacto" name="impacto" class="form-control" required>
+                        <option value="" disabled selected>Seleccione una opción</option>
+                        <option value="Anulación">Anulacion</option>
+                        <option value="Eliminación">Eliminación</option>
+                        <option value="Reversa">Reversas</option>
+                        <option value="Cambio_fecha">Cambio de Fecha</option>
+                        <option value="Consultas">Consultas</option>
+                        <option value="Consultas">Requerimientos</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="tiempo_respuesta" class="form-label">Fecha de Respuesta:</label>
+                    <input type="text" id="tiempo_respuesta" name="tiempo_respuesta" class="form-control" placeholder="DD-MM-YYYY" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="hora_respuesta" class="form-label">Hora de Respuesta:</label>
+                    <input type="time" id="hora_respuesta" name="hora_respuesta" class="form-control" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <label for="comentarios" class="form-label">Comentarios Adicionales:</label>
+                    <textarea id="comentarios" name="comentarios" class="form-control" rows="2"></textarea>
+                </div>
+            </div>
+            <div class="text-center mb-4">
+                <button type="submit" id="guardar" class="btn btn-primary">Guardar</button>
+                <button type="button" id="limpiar" class="btn btn-secondary">Limpiar</button>
+            </div>
+        </form>
+
+        <!-- Mensaje de confirmación -->
+        <div id="mensaje" class="alert alert-success d-none text-center mt-4" role="alert">
+            ¡Formulario enviado exitosamente!
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Limpia los campos del formulario al hacer clic en el botón "Limpiar"
+        document.getElementById('limpiar').addEventListener('click', () => {
+            document.getElementById('formulario').reset();
+        });
+
+        // Formatea automáticamente los campos de fecha
+        const formatDateField = (fieldId) => {
+            document.getElementById(fieldId).addEventListener('input', function (e) {
+                let input = e.target.value.replace(/\D/g, '');
+                if (input.length > 2) input = input.slice(0, 2) + '-' + input.slice(2);
+                if (input.length > 5) input = input.slice(0, 5) + '-' + input.slice(5);
+                e.target.value = input.slice(0, 10);
+            });
+        };
+
+        formatDateField('fecha_solicitud');
+        formatDateField('tiempo_respuesta');
+
+        // Manejo del formulario
+        document.getElementById('formulario').addEventListener('submit', function (e) {
+            e.preventDefault(); // Prevenir envío inmediato
+
+            const form = e.target;
+            const formData = new FormData(form);
+            const submitButton = document.getElementById('guardar');
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Guardando...';
+
+            fetch(form.action, {
+                method: form.method,
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                // Mostrar mensaje de éxito
+                const mensaje = document.getElementById('mensaje');
+                mensaje.classList.remove('d-none');
+
+                // Ocultar mensaje después de 3 segundos
+                setTimeout(() => {
+                    mensaje.classList.add('d-none');
+                    window.location.reload(); // Recargar página
+                }, 3000);
+
+                // Resetear formulario después de enviarlo
+                form.reset();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            })
+            .finally(() => {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Guardar';
+            });
+        });
+    </script>
+</body>
+</html>
